@@ -7,7 +7,8 @@ import 'package:app/values/colors.dart';
 import 'package:app/values/styles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:quotes/quotes.dart';
+import '../models/quotes.dart';
+
 
 class Homepage extends StatefulWidget {
   const Homepage({Key? key}) : super(key: key);
@@ -19,6 +20,7 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   int _currentindex =0;
   PageController _pagecontroller=PageController();
+  var quote=[];
   List<EnglishToday> words = [];
   List<int> fixedListRandom({int len=1, int max=120,int min=1}){
     if(len>max||len<min) { return [];}
@@ -43,10 +45,25 @@ class _HomepageState extends State<Homepage> {
     for (var index in rans) {newList.add(nouns[index]);}
     words= newList.map((e) => EnglishToday(noun: e)).toList();
   }
+
+  setQuote() {
+    int i;
+    List<int> L=[];
+    List<String> S=[];
+      for(i=0;i<=5;i++){// chọn 5 chỉ số
+      var randomNumber = Random().nextInt(quotes.length);
+      if(!L.contains(randomNumber)){L+=[randomNumber];}
+      else{i--;}}
+      L.forEach((element) { S.add(quotes[element]["quote"]!);});
+      quote=S;
+
+
+  }
   final GlobalKey<ScaffoldState> _key = GlobalKey(); // Create a key
   @override
   void initState(){
     getEnglishToday();
+    setQuote();
     super.initState();
   }
   Widget build(BuildContext context) {
@@ -93,6 +110,7 @@ class _HomepageState extends State<Homepage> {
                   firstLetter=firstLetter.substring(0,1);
                   String leftLetter=words[index].noun !=null ? words[index].noun! : " ";
                   leftLetter=leftLetter.substring(1,leftLetter.length);
+                  List quote1=quote;
                 return Container(
                   margin: const EdgeInsets.only(right: 16),
                   decoration: const BoxDecoration(color: AppColors.primaryColor,
@@ -128,7 +146,7 @@ class _HomepageState extends State<Homepage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB( 12,64,12,64),
-                        child: Text(Quotes.getRandom().getContent(),
+                        child: Text(quote1[index],overflow: TextOverflow.ellipsis,maxLines: 9,
                         style: AppStyles.h4.copyWith(letterSpacing: 1,color: AppColors.textColor)),
                       )
                     ],
@@ -155,9 +173,9 @@ class _HomepageState extends State<Homepage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryColor,
         onPressed: (){
-          print('exchange');
           setState(() {
             getEnglishToday();
+            setQuote();
           });
         },
         child: Icon(Icons.change_circle,),
